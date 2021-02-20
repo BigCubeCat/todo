@@ -32,9 +32,7 @@ func main() {
 		for _, t := range todos {
 			now := time.Now()
 			if t.HasDeadline {
-				fmt.Println("G")
 				if now.Year() == t.Deadline.Year() && now.YearDay() == t.Deadline.YearDay() {
-					fmt.Println("DO")
 					if err := emitSignal("TODO", t.Name, ""); err != nil {
 						panic(err)
 					}
