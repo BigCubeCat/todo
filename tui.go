@@ -19,6 +19,12 @@ const (
 	helpMode
 
 	usage = `
+
+--Syntax--
+{Task text}
+	or
+{Task text} t=({year}-{month}-{day})
+
 --Normal Mode--
 
 j - move cursor one line down
