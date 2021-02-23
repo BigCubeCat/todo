@@ -319,7 +319,7 @@ func (m model) editTaskUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 			new_name, deadlined, t := readInputTask(m.editTaskNameInput.Value())
 			m.tasks[m.cursor-1] = &Task{
-				ID:          m.latestTaskID,
+				ID:          m.tasks[m.cursor-1].ID,
 				Name:        new_name,
 				CreatedAt:   time.Now(),
 				HasDeadline: deadlined,
