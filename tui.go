@@ -244,6 +244,23 @@ func (m model) doneTaskListUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func readInputTask(value string) (string, bool, time.Time) {
+	values := strings.Split(value, "t=")
+	var t time.Time
+	var err error
+	deadlined := false
+	if len(values) == 2 {
+		lay := "2006-01-02"
+		t, err = time.Parse(lay, values[1])
+		if err != nil {
+			t = time.Now()
+		}
+		deadlined = true
+	}
+	return values[0], deadlined, t
+
+}
+
 func (m model) addingTaskUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 
@@ -262,26 +279,10 @@ func (m model) addingTaskUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			m.latestTaskID++
-			value := m.newTaskNameInput.Value()
-			values := strings.Split(value, "t=")
-			var t time.Time
-			var err error
-			deadlined := false
-			if len(values) == 0 {
-				return m, nil
-				t = time.Now()
-				err = nil
-			} else if len(values) == 2 {
-				lay := "2006-01-02"
-				t, err = time.Parse(lay, values[1])
-				if err != nil {
-					t = time.Now()
-				}
-				deadlined = true
-			}
+			new_name, deadlined, t := readInputTask(m.newTaskNameInput.Value())
 			m.tasks = append(m.tasks, &Task{
 				ID:          m.latestTaskID,
-				Name:        values[0],
+				Name:        new_name,
 				CreatedAt:   time.Now(),
 				HasDeadline: deadlined,
 				Deadline:    t,
@@ -316,7 +317,14 @@ func (m model) editTaskUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.editTaskNameInput.Value() == "" {
 				return m, nil
 			}
-			m.tasks[m.cursor-1].Name = m.editTaskNameInput.Value()
+			new_name, deadlined, t := readInputTask(m.editTaskNameInput.Value())
+			m.tasks[m.cursor-1] = &Task{
+				ID:          m.latestTaskID,
+				Name:        new_name,
+				CreatedAt:   time.Now(),
+				HasDeadline: deadlined,
+				Deadline:    t,
+			}
 
 			m.mode = normalMode
 			m.editTaskNameInput.Reset()
